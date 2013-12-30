@@ -1288,6 +1288,16 @@ cc.Texture2DCanvas = cc.Class.extend(/** @lends cc.Texture2D# */{
 cc.Texture2D = cc.Browser.supportWebGL ? cc.Texture2DWebGL : cc.Texture2DCanvas;
 
 /**
+ * Currently JavaScript Bindigns (JSB), in some cases, needs to use retain and release. This is a bug in JSB,
+ * and the ugly workaround is to use retain/release. So, these 2 methods were added to be compatible with JSB.
+ * This is a hack, and should be removed once JSB fixes the retain/release bug
+ */
+cc.Texture2D.prototype.retain = function () {
+    return this;
+};
+cc.Texture2D.prototype.release = function () {};
+
+/**
  * <p>
  *     sets the default pixel format for UIImagescontains alpha channel.                                             <br/>
  *     If the UIImage contains alpha channel, then the options are:                                                  <br/>
