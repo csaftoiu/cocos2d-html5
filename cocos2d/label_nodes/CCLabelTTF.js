@@ -587,7 +587,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         //this is fillText for canvas
         if (context.font != this._fontStyleStr)
             context.font = this._fontStyleStr;
-        context.fillStyle = this._fillColorStr;
+        context.fillStyle = "rgba(0, 0, 0, 1)"; // this._fillColorStr;
 
         var xOffset = 0, yOffset = 0;
         //stroke style setup
@@ -647,6 +647,15 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
                 context.fillText(this._string, xOffset, yOffset);
             }
         }
+
+        var imageData = context.getImageData(0,0,this._labelCanvas.width, this._labelCanvas.height);
+        var data = imageData.data;
+        for(var i = 0; i < data.length; i+=4) {
+            data[i] = 255 - data[i];
+            data[i+1] = 255 - data[i+1];
+            data[i+2] = 255 - data[i+2];
+        }
+        context.putImageData(imageData, 0, 0);
     },
 
     _getLabelContext:function () {
@@ -808,7 +817,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
             this._shaderProgram.use();
             this._shaderProgram.setUniformForModelViewAndProjectionMatrixWithMat4();
 
-            cc.glBlendFunc(this._blendFunc.src, this._blendFunc.dst);
+            //cc.glBlendFunc(this._blendFunc.src, this._blendFunc.dst);
+            //cc.glBlendFunc(gl.ONE_MINUS_SRC_COLOR, gl.SRC_COLOR);
             cc.glBindTexture2D(locTexture);
 
             cc.glEnableVertexAttribs(cc.VERTEX_ATTRIB_FLAG_POSCOLORTEX);
