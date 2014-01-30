@@ -67,6 +67,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     _labelCanvas:null,
     _labelContext:null,
 
+    _colorOverrideForWebGL:false,
+
     /**
      * Constructor
      */
@@ -97,6 +99,8 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         this._strokeShadowOffsetY = 0;
         this._needUpdateTexture = false;
 
+        this._colorOverrideForWebGL = false;
+
         this._setColorsString();
     },
 
@@ -122,6 +126,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     _setColorsString: null,
 
     _setColorsStringForCanvas: function () {
+        this._colorOverrideForWebGL = false;
         this._needUpdateTexture = true;
 
         var locDisplayColor = this._displayedColor, locDisplayedOpacity = this._displayedOpacity;
@@ -135,6 +140,7 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
     },
 
     _setColorsStringForWebGL:function(){
+        this._colorOverrideForWebGL = true;
         this._needUpdateTexture = true;
         var locStrokeColor = this._strokeColor, locFontFillColor = this._textFillColor;
         this._shadowColorStr = "rgba(128,128,128," + this._shadowOpacity + ")";
@@ -587,7 +593,13 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
         //this is fillText for canvas
         if (context.font != this._fontStyleStr)
             context.font = this._fontStyleStr;
-        context.fillStyle = "rgba(0, 0, 0, 1)"; // this._fillColorStr;
+
+        if (this._colorOverrideForWebGL) {
+            context.fillStyle = "rgba(0, 0, 0, 1)";
+        }
+        else {
+            context.fillStyle = this._fillColorStr;
+        }
 
         var xOffset = 0, yOffset = 0;
         //stroke style setup
@@ -648,14 +660,16 @@ cc.LabelTTF = cc.Sprite.extend(/** @lends cc.LabelTTF# */{
             }
         }
 
-        var imageData = context.getImageData(0,0,this._labelCanvas.width, this._labelCanvas.height);
-        var data = imageData.data;
-        for(var i = 0; i < data.length; i+=4) {
-            data[i] = 255 - data[i];
-            data[i+1] = 255 - data[i+1];
-            data[i+2] = 255 - data[i+2];
+        if (this._colorOverrideForWebGL) {
+            var imageData = context.getImageData(0,0,this._labelCanvas.width, this._labelCanvas.height);
+            var data = imageData.data;
+            for(var i = 0; i < data.length; i+=4) {
+                data[i] = 255 - data[i];
+                data[i+1] = 255 - data[i+1];
+                data[i+2] = 255 - data[i+2];
+            }
+            context.putImageData(imageData, 0, 0);
         }
-        context.putImageData(imageData, 0, 0);
     },
 
     _getLabelContext:function () {

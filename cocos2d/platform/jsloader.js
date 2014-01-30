@@ -304,12 +304,21 @@
     };
 
     var loaded = 0;
-    var que = engine.concat(c.appFiles);
-    que.push('main.js');
 
-    var cacheBusted = function (f) {
-        return c.cacheBuster ? (f + "?" + c.cacheBuster) : f;
+    var cacheBusted = function (f, isAppFile) {
+        var cacheBuster = isAppFile ? (c.appCacheBuster || c.cacheBuster) : c.cacheBuster;
+        return cacheBuster ? (f + "?" + cacheBuster) : f;
     };
+    var que = engine.concat([]);
+
+    for (var i=0; i < que.length; i++) {
+        que[i] = cacheBusted(que[i], false);
+    }
+    for (var j=0; j < c.appFiles.length; j++) {
+        que.push(cacheBusted(c.appFiles[j], true));
+    }
+
+    que.push(cacheBusted('main.js', false));
 
     if (navigator.userAgent.indexOf("Trident/5") > -1) {
         //ie9
@@ -318,7 +327,7 @@
             i++;
             if (i < que.length) {
                 var f = d.createElement('script');
-                f.src = cacheBusted(que[i]);
+                f.src = que[i];
                 f.addEventListener('load',function(){
                     loadNext();
                     updateLoading(loaded / que.length);
@@ -334,7 +343,7 @@
         que.forEach(function (f, i) {
             var s = d.createElement('script');
             s.async = false;
-            s.src = cacheBusted(f);
+            s.src = f;
             s.addEventListener('load',function(){
                 loaded++;
                 updateLoading(loaded / que.length);

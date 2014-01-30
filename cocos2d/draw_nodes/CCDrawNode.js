@@ -172,20 +172,36 @@ cc.DrawNodeCanvas = cc.Node.extend(/** @lends cc.DrawNodeCanvas# */{
     },
 
     /**
-     * draw a polygon with a fill color and line color
+     * draw a polygon with a fill color and line color without copying the vertices
      * @param {Array} verts
      * @param {cc.Color4F} fillColor
      * @param {Number} borderWidth
      * @param {cc.Color4F} borderColor
      */
-    drawPoly:function (verts, fillColor, borderWidth, borderColor) {
+    drawPoly_:function (verts, fillColor, borderWidth, borderColor) {
         var element = new cc._DrawNodeElement(cc.DrawNode.TYPE_POLY );
+
         element.verts = verts;
         element.count = verts.length;
         element.fillColor = fillColor;
         element.borderWidth = borderWidth;
         element.borderColor = borderColor;
         this._buffer.push(element);
+    },
+
+    /**
+     * draw a polygon with a fill color and line color, making a copy of the vertices list
+     * @param {Array} verts
+     * @param {cc.Color4F} fillColor
+     * @param {Number} borderWidth
+     * @param {cc.Color4F} borderColor
+     */
+    drawPoly:function (verts, fillColor, borderWidth, borderColor) {
+        var vertsCopy = [];
+        for (var i=0; i < verts.length; i++) {
+            vertsCopy.push(cc.p(verts[i].x, verts[i].y));
+        }
+        return this.drawPoly_(vertsCopy, fillColor, borderWidth, borderColor);
     },
 
     /**

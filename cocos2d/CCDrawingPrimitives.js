@@ -300,6 +300,7 @@ cc.DrawingPrimitiveCanvas = cc.DrawingPrimitive.extend(/** @lends cc.DrawingPrim
 
         var firstPoint = vertices[0], locContext = this._renderContext;
         var locScaleX = cc.EGLView.getInstance().getScaleX(), locScaleY = cc.EGLView.getInstance().getScaleY();
+
         locContext.beginPath();
         locContext.moveTo(firstPoint.x * locScaleX, -firstPoint.y * locScaleY);
         for (var i = 1, len = vertices.length; i < len; i++)
